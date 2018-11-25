@@ -66,7 +66,7 @@ References
 
 ## Sample assets
 
-![](/assets/soda-architecture-draft-v1.jpg)
+![](/assets/soda-architecture-draft-v2.png)
 
 ![](/assets/vitrage-graph-example-1.png)
 

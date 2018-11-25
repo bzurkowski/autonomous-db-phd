@@ -41,3 +41,29 @@ Comments on Oracle Autonomous Database:
 * [Self-Driving Databases are Coming: What Next for DBAs?](https://www.datanami.com/2018/05/02/self-driving-databases-are-coming-what-next-for-dbas/)
 
 * [Oracle Autonomous Database – is it truly self-driving?](https://www.ibmbigdatahub.com/blog/oracle-autonomous-database-it-truly-self-driving)
+
+## Autnomic Computing
+
+* [The SELFNET Approach for Autonomic Management in an NFV/SDN Networking Paradigm](https://journals.sagepub.com/doi/full/10.1155/2016/2897479)
+
+* [QoE-Driven, Energy-Aware Video Adaptation in 5G Networks: The SELFNET Self-Optimisation Use Case](https://journals.sagepub.com/doi/full/10.1155/2016/7829305)
+
+* [The SELFNET Approach for Autonomic Management in an NFV/SDN Networking Paradigm](https://journals.sagepub.com/doi/10.1155/2016/2897479)
+
+* [Towards Incidence Management in 5G Based on Situational Awareness](https://www.mdpi.com/1999-5903/9/1/3)
+
+* [Monitoring and Discovery for Self-Organized Network Management in Virtualized and Software Defined Networks](https://www.mdpi.com/1424-8220/17/4/731)
+
+* [Autonomic self-organised network management](https://www.eurescom.eu/news-and-events/eurescommessage/eurescom-message-summer-2017/autonomic-self-organised-network-management.html)
+
+* [Orchestration of use-case driven analytics in 5G scenarios](https://link.springer.com/article/10.1007%2Fs12652-017-0542-0)
+
+* [Tactical autonomic language for 5G network management](https://ieeexplore.ieee.org/document/8300481)
+
+* [A Self-Adaptive Deep Learning-Based System for Anomaly Detection in 5G Networks](https://ieeexplore.ieee.org/document/8283694)
+
+* [Towards the autonomous provision of self-protection capabilities in 5G networks](https://link.springer.com/article/10.1007%2Fs12652-018-0848-6)
+
+
+## Reference implementation materials (OpenStack)
+

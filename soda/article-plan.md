@@ -6,6 +6,8 @@
 
 * "Concept of autonomy-driven database orchestration framework based on MAPE-K"
 
+* "Approach for autonomic database orchestration"
+
 * "Concept of autonomic control loop for self-managed database systems"
 
 * "Concept of self-adapting database systems"
@@ -36,13 +38,15 @@ Abstract
 
     4.1. Overall design
 
-    4.2. Database Onboarding Layer
+    4.2. Sensor datasources
 
-    4.3. Database Control Layer
+    4.3. Resource Entity Graph
 
-    4.4. Autonomic Layer
+    4.4. Scenario temlates
 
-    4.5. Access Layer
+    4.5. Workflows
+
+    4.6. ...
 
 5. Autonomic properties case study
 

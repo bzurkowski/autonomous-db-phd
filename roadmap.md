@@ -12,3 +12,22 @@
 
 6. Multi-site
 
+## Research questions
+
+1. To what extent the cloud infrastructure can support autonomous database management?
+
+    * How it helps in terms of optimization?
+
+    * How it helps in terms of healing?
+
+    * How it helps in terms of configuration?
+
+    * ...
+
+2. Should database solution itself implement autonomous features?
+
+    * How to integrate database autonomy with infrastructure autonommy?
+
+    * Where is the integration boundary? Where are the integration points?
+
+    * What are the benefits of adding autonomy in different domains and infrastructure levels?

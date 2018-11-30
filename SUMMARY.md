@@ -12,3 +12,4 @@
 ## OPENSTACK
 
 * [Kolla setup](openstack/kolla-setup.md)
+* [Kolla image building](openstack/kolla-image-building.md)

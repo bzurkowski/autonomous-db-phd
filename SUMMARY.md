@@ -18,3 +18,4 @@
 * [Kolla setup](openstack/kolla-setup.md)
 * [Kolla image building](openstack/kolla-image-building.md)
 * [Cheatsheet](openstack/cheatsheet.md)
+* [Troubleshooting](openstack/troubleshooting.md)

@@ -9,7 +9,12 @@
 * [Article plan](soda/article-plan.md)
 * [Case study plan](soda/case-study-plan.md)
 
+## SODA POC
+
+* [Cheatsheet](soda-poc/cheatsheet.md)
+
 ## OPENSTACK
 
 * [Kolla setup](openstack/kolla-setup.md)
 * [Kolla image building](openstack/kolla-image-building.md)
+* [Cheatsheet](openstack/cheatsheet.md)

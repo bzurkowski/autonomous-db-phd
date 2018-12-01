@@ -119,27 +119,13 @@ $ git config --global user.name "operator"
 Clone Kolla Ansible repository:
 
 ```bash
-$ git clone https://git.openstack.org/openstack/kolla-ansible.git
-```
-
-Fetch all references:
-
-```bash
-git fetch origin "+refs/changes/*:refs/remotes/origin/changes/*"
+$ https://github.com/soda-research/kolla-ansible.git
 ```
 
 Checkout:
 
 ```bash
-git checkout -b soda-poc 25ef71c20bce25b9b79d04a9b8232f27f4ac8a78
-```
-
-Cherry-pick Kolla Ansible patches:
-
-```bash
-$ git remote add bz https://github.com/bzurkowski/kolla-ansible.git
-$ git fetch bz
-$ git cherry-pick 05a9f9abb9a47ea3e45ce4c566e0ea5b871982fe..dd7de79136c826c5de3135eb91fd4b185cc14ead
+git checkout soda-poc
 ```
 
 Setup virtualenv:
@@ -164,49 +150,30 @@ $ cp -r /root/.venvs/kolla/share/kolla-ansible/etc_examples/kolla /etc/
 $ cp /root/.venvs/kolla/share/kolla-ansible/ansible/inventory/* .
 ```
 
-Modify deployment configuration in `/etc/kolla/globals.yml`:
+Clone repository with custom deployment configuration:
 
-```yaml
----
-config_strategy: "COPY_ALWAYS"
-
-kolla_base_distro: "centos"
-kolla_install_type: "source"
-openstack_release: "master"
-
-kolla_source_version: "master"
-trove_dev_mode: "yes"
-vitrage_dev_mode: "yes"
-mistral_dev_mode: "yes"
-
-kolla_internal_vip_address: "192.168.200.50"
-kolla_external_vip_address: "192.168.100.50"
-
-docker_registry: "192.168.200.115:4000"
-
-network_interface: "eth2"
-
-#kolla_external_vip_interface: "{{ network_interface }}"
-#api_interface: "{{ network_interface }}"
-#storage_interface: "{{ network_interface }}"
-
-neutron_external_interface: "eth1"
-
-neutron_plugin_agent: "linuxbridge"
-
-enable_cinder: "yes"
-enable_cinder_backup: "yes"
-enable_cinder_backend_lvm: "yes"
-enable_haproxy: "yes"
-enable_heat: "no"
-enable_horizon: "yes"
-enable_horizon_mistral: "{{ enable_mistral | bool }}"
-enable_horizon_trove: "{{ enable_trove | bool }}"
-enable_mistral: "yes"
-enable_monasca: "yes"
-enable_trove: "yes"
-enable_vitrage: "yes"
+```bash
+$ git clone https://github.com/soda-research/soda-poc.git
 ```
+
+Copy custom configuration to Kolla configuration directory:
+
+```bash
+$ cp -r ./soda-poc/kolla/etc/kolla/config /etc/kolla/
+$ cp ./soda-poc/kolla/etc/kolla/globals.yml /etc/kolla/
+```
+
+Review and adjust parameters in `/etc/kolla/globals.yml`, in particular:
+
+* `kolla_internal_vip_address`
+* `kolla_external_vip_address`
+* `network_interface`
+* `kolla_external_vip_interface`
+* `docker_registry`
+
+Review and adjust configuration content in copied files, in particular:
+
+* `/etc/kolla/config/neutron/ml2_plugin.ini`
 
 Modify deployment inventory in `/root/multinode`:
 
@@ -227,34 +194,6 @@ osc1
 [storage]
 comp1
 comp2
-```
-
-Apply Nova config patches:
-
-```bash
-mkdir -p /etc/kolla/config/nova/
-cat > /etc/kolla/config/nova/nova-compute.conf <<EOF
-[libvirt]
-virt_type = qemu
-cpu_mode = none
-EOF
-```
-
-Apply Trove config patches:
-
-```bash
-mkdir -p /etc/kolla/config/trove/
-cat > /etc/kolla/config/trove/trove-taskmanager.conf <<EOF
-[mariadb]
-icmp = True
-tcp_ports = 22,3306,4444,4567,4568
-EOF
-```
-
-Apply Monasca config patches:
-
-```bash
-$ echo "log.message.format.version=0.9.0.0" >> /etc/kolla/config/kafka.server.properties
 ```
 
 Generate passwords:
@@ -398,23 +337,46 @@ $ pip install python-openstackclient \
               python-vitrageclient
 ```
 
-Create networks:
+Download resource init script:
 
 ```bash
-$ openstack network create --provider-network-type flat --provider-physical-network mgmt internal
-
-$ openstack subnet create --subnet-range 192.168.122.0/24 --dhcp --allocation-pool start=192.168.122.100,end=192.168.122.200 --dns-nameserver 8.8.8.8 --network internal internal-subnet
+$ wget https://raw.githubusercontent.com/openstack/kolla-ansible/master/tools/init-runonce
+$ chmod +x init-runonce
 ```
 
-Create flavors:
+Run resource init script:
 
 ```bash
-$ openstack flavor create --id 6 \
-                          --disk 5 \
-                          --ram 1024 \
-                          --vcpus 1 \
-                          --public \
-                          test.small
+$ . ./init-runonce
+```
+
+Create additional networks:
+
+```bash
+$ openstack network create \
+      --provider-network-type flat \
+      --provider-physical-network \
+      mgmt internal
+
+$ openstack subnet create \
+      --subnet-range 192.168.200.0/24 \
+      --dhcp \
+      --allocation-pool start=192.168.200.100,end=192.168.200.200 \
+      --dns-nameserver 8.8.8.8 \
+      --network \
+      internal internal-subnet
+```
+
+Create additional flavors:
+
+```bash
+$ openstack flavor create \
+      --id 6 \
+      --disk 5 \
+      --ram 1024 \
+      --vcpus 1 \
+      --public \
+      test.small
 ```
 
 Create volume types:
@@ -541,4 +503,40 @@ Add Vitrage user to admin project:
 $ openstack role add --user vitrage \
                      --project \
                      admin admin
+```
+
+## Test deployment
+
+Create sample server:
+
+```bash
+$ network_id=$(openstack network list |grep internal |awk '{print $2}')
+$ openstack server create \
+      --image cirros \
+      --flavor test.small \
+      --key-name mykey \
+      --network $network_id \
+      demo1
+```
+
+Create sample database instance:
+
+```bash
+$ network_id=$(openstack network list |grep internal |awk '{print $2}')
+$ trove create demo test.small \
+      --size 1 \
+      --volume_type default \
+      --datastore mariadb \
+      --datastore_version 10.1.32 \
+     --nic net-id=$network_id \
+```
+
+Create sample database cluster:
+
+```bash
+$ network_id=$(openstack network list |grep internal |awk '{print $2}')
+$ trove cluster-create summit-poc mariadb 10.1.32 \
+      --instance "flavor=test.small,volume=1,nic='net-id=$network_id'" \
+      --instance "flavor=test.small,volume=1,nic='net-id=$network_id'" \
+      --instance "flavor=test.small,volume=1,nic='net-id=$network_id'"
 ```

@@ -1,6 +1,6 @@
 # Roadmap
 
-1. Use cases definition and requirements of the framework and its components
+1. Definition of use cases and requirements for the framework and its components
 
 2. Reference architecture and implementation
 

@@ -67,3 +67,49 @@ Comments on Oracle Autonomous Database:
 
 ## Reference implementation materials (OpenStack)
 
+https://medium.com/netflix-techblog/introducing-winston-event-driven-diagnostic-and-remediation-platform-46ce39aa81cc
+
+https://www.openstack.org/videos/barcelona-2016/sleep-better-at-night-openstack-cloud-auto-healing
+
+https://www.mirantis.com/blog/auto-remediation-making-an-openstack-cloud-self-healing/
+
+https://stackstorm.com/
+
+https://www.openstack.org/assets/presentation-media/Senlin-mistral-V2.pdf
+
+## Common database failures and issues
+
+https://www.24hourdata.com/blog/3-causes-database-failure-what-do-data-recovery-emergency%E2%80%A8
+
+http://techgenix.com/top-5-enterprise-database-issues/
+
+https://qrius.com/types-of-database-failures-and-how-can-backup-prevent-the-loss/
+
+https://soaringeagle.biz/types-of-database-failures/
+
+https://docs.oracle.com/cd/A59447_01/nt_804ee/doc/database.804/a58227/ch22.htm
+
+## Galera cluster failures
+
+https://severalnines.com/blog/9-tips-going-production-galera-cluster-mysql
+
+## Simulating database failures
+
+https://severalnines.com/blog/several-ways-intentionally-fail-or-crash-your-mysql-instances-testing
+
+http://www.dba-oracle.com/t_simulating_server_disk_failures.htm
+
+http://galeracluster.com/documentation-webpages/testingcluster.html
+
+# Live migrations
+
+https://developer.rackspace.com/blog/Code-Dive-Openstack-Live-Migrations-Part-1/
+https://www.youtube.com/watch?v=Vy8rS_5vea4
+
+
+
+
+
+
+
+https://severalnines.com/blog/how-benchmark-performance-mysql-mariadb-using-sysbench

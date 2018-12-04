@@ -2,15 +2,7 @@
 
 ## Prepare all nodes
 
-Install Python and upgrade pip:
-
-```bash
-$ yum install -y epel-release
-$ yum install -y python-pip
-$ pip install -U pip
-```
-
-Install dependencies:
+Install dependencies and base packages:
 
 ```bash
 $ yum install -y python-devel \
@@ -18,6 +10,16 @@ $ yum install -y python-devel \
                  gcc \
                  openssl-devel \
                  libselinux-python
+
+$ yum install -y net-tools telnet wget htop bridge-utils
+```
+
+Install Python and upgrade pip:
+
+```bash
+$ yum install -y epel-release
+$ yum install -y python-pip
+$ pip install -U pip
 ```
 
 Disable firewall:
@@ -107,25 +109,11 @@ pipelining=True
 forks=100
 ```
 
-Install and configure git:
-
-```bash
-$ yum install -y git
-
-$ git config --global user.email "operator@soda-os-poc"
-$ git config --global user.name "operator"
-```
-
 Clone Kolla Ansible repository:
 
 ```bash
-$ https://github.com/soda-research/kolla-ansible.git
-```
-
-Checkout:
-
-```bash
-git checkout soda-poc
+$ git clone https://github.com/soda-research/kolla-ansible.git
+$ git checkout soda-poc
 ```
 
 Setup virtualenv:
@@ -202,7 +190,11 @@ Generate passwords:
 $ kolla-genpwd
 ```
 
-Update password for `keystone_admim`.
+Simplify passwords in `/etc/kolla/password.yml`, in particular:
+
+* `keystone_admim`
+* `database_password`
+* `rabbitmq_password`
 
 ## Prepare OSC
 
@@ -212,6 +204,13 @@ Populate `/etc/hosts` file, e.g.:
 192.168.100.233 osc1
 192.168.100.222 comp1
 192.168.100.231 comp2
+```
+
+Distribute public key to compute nodes:
+
+```bash
+$ ssh-copy-id comp1
+$ ssh-copy-id comp2
 ```
 
 [Start local Docker registry](https://gist.github.com/sfoolish/090c93a1ff417cbed3b148b07f501ab2):
@@ -225,12 +224,18 @@ $ docker run -d \
     registry:2
 ```
 
+Download archive with Monasca images into `/root/` directory.
+
 Push Monasca images:
 
 ```bash
 $ gunzip monasca-docker-images.tar.gz
 $ docker load -i monasca-docker-images.tar
+```
 
+Re-tag pushed images:
+
+```bash
 docker tag 695614bd3c20 kolla/centos-source-monasca-thresh:master
 docker tag 450e8913a681 kolla/centos-source-monasca-api:master
 docker tag 60a15ff5c04d kolla/centos-source-monasca-agent:master
@@ -251,6 +256,12 @@ $ docker run -d \
     -v registry:/var/lib/registry \
     -e REGISTRY_PROXY_REMOTEURL=https://registry-1.docker.io \
     registry:2
+```
+
+Clone repository with custom deployment configuration:
+
+```bash
+$ git clone https://github.com/soda-research/soda-poc.git
 ```
 
 ## Prepare storage nodes
@@ -309,16 +320,24 @@ Run post deployment:
 $ kolla-ansible post-deploy
 ```
 
-Source credentials:
-
-```bash
-$ . /etc/kolla/admin-openrc.sh
-```
-
 Update credentials with endpoint type appropriate for older versions of OpenStack clients:
 
 ```bash
 $ echo "export OS_ENDPOINT_TYPE=internal" >> /etc/kolla/admin-openrc.sh
+```
+
+Upload credentials to OSC:
+
+```bash
+$ rsync /etc/kolla/admin-openrc.sh root@osc1:/etc/kolla/admin-openrc.sh
+```
+
+## Post deployment: OSC
+
+Source credentials:
+
+```bash
+$ . /etc/kolla/admin-openrc.sh
 ```
 
 Source credentials on each session:
@@ -386,6 +405,30 @@ $ openstack volume type create default
 ```
 
 ## Post deployment: Trove
+
+Update Trove code with additional patches:
+
+```bash
+$ cd /opt/stack/trove
+$ git remote add soda https://github.com/soda-research/trove.git
+$ git fetch soda
+$ git checkout soda-poc
+```
+
+Update Trove CLI code with additional patches:
+
+```bash
+$ cd /opt/stack/python-troveclient
+$ git remote add soda https://github.com/soda-research/python-troveclient.git
+$ git fetch soda
+$ git checkout soda-poc
+```
+
+Restart Trove containers:
+
+```bash
+$ for i in $(docker ps |grep trove); do echo $i; docker restart $i; done
+```
 
 Put Trove guest images into `/root/images/` directory.
 
@@ -497,12 +540,51 @@ $ openstack role add admin --project monasca_control_plane \
 
 ## Post deployment: Vitrage
 
+Update Vitrage code with Trove and Monasca datasources:
+
+```bash
+$ cd /opt/stack/vitrage
+$ git remote add soda https://github.com/soda-research/vitrage.git
+$ git fetch soda
+$ git checkout soda-poc
+```
+
+Restart Vitrage containers:
+
+```bash
+$ for i in $(docker ps |grep vitrage); do echo $i; docker restart $i; done
+```
+
+Copy datasource values manifests:
+
+```bash
+$ cp -r /root/soda-poc/kolla/etc/kolla/config/vitrage/datasources_values/ /etc/kolla/vitrage-graph/datasources_values
+$ cp -r /root/soda-poc/kolla/etc/kolla/config/vitrage/datasources_values/ /etc/kolla/vitrage-collector/datasources_values
+```
+
 Add Vitrage user to admin project:
 
 ```bash
 $ openstack role add --user vitrage \
                      --project \
                      admin admin
+```
+
+## Post deployment: Mistral
+
+Update Mistral code with additional patches:
+
+```bash
+$ cd /opt/stack/mistral
+$ git remote add soda https://github.com/soda-research/mistral.git
+$ git fetch soda
+$ git checkout soda-poc
+```
+
+Restart Mistral containers:
+
+```bash
+$ for i in $(docker ps |grep mistral); do echo $i; docker restart $i; done
 ```
 
 ## Test deployment

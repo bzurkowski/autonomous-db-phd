@@ -2,7 +2,23 @@
 
 ## Title
 
-* **"Concept of autonomy(autonomic?)-driven database orchestration framework"**
+* Autonomy-driven large-scale database orchestration framework based on MAPE-K
+
+* Self-organizing large-scale database orchestration framework
+
+* Self-organizing large-scale database orchestration architecture
+
+* Self-organizing cloud database infrastructure
+
+* **Self-organizing cloud database infrastructure orchestration**
+
+* **Self-organizing cloud infrastructure orchestration for large-scale database systems**
+
+* **Self-organizing infrastructure orchestration for large-scale cloud database systems**
+
+* Self-organizing large-scale cloud database infrastructure orchestration
+
+* "Concept of autonomy(autonomic?)-driven database orchestration framework"
 
 * "Concept of autonomy-driven database orchestration framework based on MAPE-K"
 

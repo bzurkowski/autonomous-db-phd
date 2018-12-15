@@ -404,6 +404,14 @@ Create volume types:
 $ openstack volume type create default
 ```
 
+## Post deployment: Nova
+
+Restart Nova Scheduler:
+
+```bash
+$ docker restart nova_scheduler
+```
+
 ## Post deployment: Trove
 
 Update Trove code with additional patches:
@@ -427,7 +435,7 @@ $ git checkout soda-poc
 Restart Trove containers:
 
 ```bash
-$ for i in $(docker ps |grep trove); do echo $i; docker restart $i; done
+$ for i in $(docker ps |grep trove |awk '{print $1}'); do echo $i; docker restart $i; done
 ```
 
 Put Trove guest images into `/root/images/` directory.
@@ -549,10 +557,16 @@ $ git fetch soda
 $ git checkout soda-poc
 ```
 
+Install Monasca client in Vitrage Graph:
+
+```bash
+$ docker exec -u0 vitrage_graph pip install python-monascaclient
+```
+
 Restart Vitrage containers:
 
 ```bash
-$ for i in $(docker ps |grep vitrage); do echo $i; docker restart $i; done
+$ for i in $(docker ps |grep vitrage |awk '{print $1}'); do echo $i; docker restart $i; done
 ```
 
 Copy datasource values manifests:
@@ -584,7 +598,7 @@ $ git checkout soda-poc
 Restart Mistral containers:
 
 ```bash
-$ for i in $(docker ps |grep mistral); do echo $i; docker restart $i; done
+$ for i in $(docker ps |grep mistral |awk '{print $1}'); do echo $i; docker restart $i; done
 ```
 
 ## Test deployment
@@ -598,14 +612,14 @@ $ openstack server create \
       --flavor test.small \
       --key-name mykey \
       --network $network_id \
-      demo1
+      soda-poc
 ```
 
 Create sample database instance:
 
 ```bash
 $ network_id=$(openstack network list |grep internal |awk '{print $2}')
-$ trove create demo test.small \
+$ trove create soda-poc test.small \
       --size 1 \
       --volume_type default \
       --datastore mariadb \
@@ -617,7 +631,7 @@ Create sample database cluster:
 
 ```bash
 $ network_id=$(openstack network list |grep internal |awk '{print $2}')
-$ trove cluster-create summit-poc mariadb 10.1.32 \
+$ trove cluster-create soda-poc mariadb 10.1.32 \
       --instance "flavor=test.small,volume=1,nic='net-id=$network_id'" \
       --instance "flavor=test.small,volume=1,nic='net-id=$network_id'" \
       --instance "flavor=test.small,volume=1,nic='net-id=$network_id'"

@@ -26,3 +26,15 @@ Vitrage Collector container continuously restarting after deployment.
 ### Solution
 
 It was [removed](https://github.com/openstack/vitrage/commit/842f9d6cea1ed85bc4a0f8c30ae9cb4a22765420#diff-29b7340ebb45e237c82e325d82bcb0b2) in the upstream. Ignore. Vitrage Graph handles Collector logic.
+
+## Restarting Monasca Agent Collector
+
+### Symptoms
+
+```
+ERROR:__main__:MissingRequiredSource: /var/lib/kolla/config_files/plugins/*.yaml file is not found
+```
+
+### Solution
+
+Missing plugin files in `/etc/kolla/monasca-agent-collector/plugins`. These files should be copied from `{{ role_path }}/templates/monasca-agent-collector/plugins/`.

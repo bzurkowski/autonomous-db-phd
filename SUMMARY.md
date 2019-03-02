@@ -12,6 +12,7 @@
 ## SODA POC
 
 * [Cheatsheet](soda-poc/cheatsheet.md)
+* [ProxySQL](soda-poc/proxy-sql.md)
 
 ## OPENSTACK
 

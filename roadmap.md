@@ -12,6 +12,8 @@
 
 6. Multi-site
 
+7. Logs analysis
+
 ## Research questions
 
 1. To what extent the cloud infrastructure can support autonomous database management?

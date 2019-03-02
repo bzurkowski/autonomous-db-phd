@@ -353,7 +353,8 @@ $ pip install python-openstackclient \
               python-troveclient \
               python-glanceclient \
               python-neutronclient \
-              python-vitrageclient
+              python-vitrageclient \
+              python-monascaclient
 ```
 
 Download resource init script:
@@ -404,24 +405,7 @@ Create volume types:
 $ openstack volume type create default
 ```
 
-## Post deployment: Nova
-
-Restart Nova Scheduler:
-
-```bash
-$ docker restart nova_scheduler
-```
-
 ## Post deployment: Trove
-
-Update Trove code with additional patches:
-
-```bash
-$ cd /opt/stack/trove
-$ git remote add soda https://github.com/soda-research/trove.git
-$ git fetch soda
-$ git checkout soda-poc
-```
 
 Update Trove CLI code with additional patches:
 
@@ -430,12 +414,6 @@ $ cd /opt/stack/python-troveclient
 $ git remote add soda https://github.com/soda-research/python-troveclient.git
 $ git fetch soda
 $ git checkout soda-poc
-```
-
-Restart Trove containers:
-
-```bash
-$ for i in $(docker ps |grep trove |awk '{print $1}'); do echo $i; docker restart $i; done
 ```
 
 Put Trove guest images into `/root/images/` directory.
@@ -473,55 +451,10 @@ Create cloudinit directory:
 $ mkdir -p /etc/kolla/trove-taskmanager/cloudinit
 ```
 
-Populate cloudinit file for MariaDB in `/etc/kolla/trove-taskmanager/cloudinit/mariadb.cloudinit`:
+Add datastore cloudinit files:
 
 ```bash
-#!/usr/bin/env bash
-
-mkdir -p /home/trove/.ssh/
-cat <<EOT >> /home/trove/.ssh/authorized_keys
-<SSH_PUBLIC_KEY>
-EOT
-
-mkdir -p /root/.ssh/
-cat <<EOT >> /root/.ssh/id_rsa
-<SSH_PRIVATE_KEY>
-EOT
-chmod 600 /root/.ssh/id_rsa
-
-ln -s /etc/trove/conf.d/trove-guestagent.conf /etc/trove/trove-guestagent.conf
-
-rsync \
-  -e "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" -a \
-  --exclude .git \
-  --exclude-from /opt/trove/.gitignore \
-  root@<OSC_INTERNAL_IP>:/opt/stack/trove/ /opt/trove-rsync
-
-chown -R trove /opt/trove-rsync
-
-systemctl stop trove-guest
-
-if [[ -d /opt/trove-rsync ]]; then
-    mv /opt/trove /opt/trove-orig
-    mv /opt/trove-rsync /opt/trove
-fi
-
-systemctl start trove-guest
-
-guest_id=$(awk -F "=" '/guest_id/ {print $2}' /etc/trove/conf.d/guest_info.conf)
-
-monasca-setup \
-  --username monitoring \
-  --password monitoring \
-  --project_name monasca_control_plane \
-  --project_domain_name default \
-  --user_domain_name default \
-  --keystone_url http://<OSC_INTERNAL_VIP>:5000/v3 \
-  --monasca_url http://<OSC_INTERNAL_VIP>:8070/v2.0 \
-  --system_only \
-  --service trove \
-  --dimensions resource_id:${guest_id},resource_type:trove.instance \
-  --verbose
+$ cp -r /root/soda-poc/kolla/etc/kolla/config/trove/cloudinit/ /etc/kolla/trove-taskmanager/cloudinit
 ```
 
 Setup OSC publis key in OSC authorized keys (for code sync between guest and OSC):
@@ -548,19 +481,17 @@ $ openstack role add admin --project monasca_control_plane \
 
 ## Post deployment: Vitrage
 
-Update Vitrage code with Trove and Monasca datasources:
-
-```bash
-$ cd /opt/stack/vitrage
-$ git remote add soda https://github.com/soda-research/vitrage.git
-$ git fetch soda
-$ git checkout soda-poc
-```
-
-Install Monasca client in Vitrage Graph:
+Install Monasca client in Vitrage Graph container:
 
 ```bash
 $ docker exec -u0 vitrage_graph pip install python-monascaclient
+```
+
+Copy datasource value manifests:
+
+```bash
+$ cp -r /root/soda-poc/kolla/etc/kolla/config/vitrage/datasources_values/ /etc/kolla/vitrage-graph/datasources_values
+$ cp -r /root/soda-poc/kolla/etc/kolla/config/vitrage/datasources_values/ /etc/kolla/vitrage-collector/datasources_values
 ```
 
 Restart Vitrage containers:
@@ -569,36 +500,12 @@ Restart Vitrage containers:
 $ for i in $(docker ps |grep vitrage |awk '{print $1}'); do echo $i; docker restart $i; done
 ```
 
-Copy datasource values manifests:
-
-```bash
-$ cp -r /root/soda-poc/kolla/etc/kolla/config/vitrage/datasources_values/ /etc/kolla/vitrage-graph/datasources_values
-$ cp -r /root/soda-poc/kolla/etc/kolla/config/vitrage/datasources_values/ /etc/kolla/vitrage-collector/datasources_values
-```
-
 Add Vitrage user to admin project:
 
 ```bash
 $ openstack role add --user vitrage \
                      --project \
                      admin admin
-```
-
-## Post deployment: Mistral
-
-Update Mistral code with additional patches:
-
-```bash
-$ cd /opt/stack/mistral
-$ git remote add soda https://github.com/soda-research/mistral.git
-$ git fetch soda
-$ git checkout soda-poc
-```
-
-Restart Mistral containers:
-
-```bash
-$ for i in $(docker ps |grep mistral |awk '{print $1}'); do echo $i; docker restart $i; done
 ```
 
 ## Test deployment

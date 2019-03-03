@@ -18,5 +18,7 @@
 
 * [Kolla setup](openstack/kolla-setup.md)
 * [Kolla image building](openstack/kolla-image-building.md)
+* [Disk image builder](openstack/disk-image-builder.md)
+* [Trove image builder](openstack/trove-image-builder.md)
 * [Cheatsheet](openstack/cheatsheet.md)
 * [Troubleshooting](openstack/troubleshooting.md)

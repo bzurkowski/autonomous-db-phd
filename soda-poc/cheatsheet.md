@@ -123,3 +123,20 @@ $ docker run \
           /usr/share/sysbench/oltp_read_write.lua \
           prepare
 ```
+
+Flavors
+
+```bash
+$ openstack flavor create -id 6 --ram 2048 --disk 5 --vcpus 2 --public test.small
+$ openstack flavor create -id 6 --ram 4096 --disk 5 --vcpus 4 --public test.medium
+$ openstack flavor create -id 6 --ram 8192 --disk 10 --vcpus 8 --public test.large
+
+
++----+-------------+-------+------+-----------+-------+-----------+
+| ID | Name        |   RAM | Disk | Ephemeral | VCPUs | Is Public |
++----+-------------+-------+------+-----------+-------+-----------+
+| 6  | test.small  |  2048 |    5 |         0 |     1 | True      |
+| 7  | test.medium |  4096 |    5 |         0 |     4 | True      |
+| 8  | test.large  |  8192 |   10 |         0 |     8 | True      |
++----+-------------+-------+------+-----------+-------+-----------+
+```

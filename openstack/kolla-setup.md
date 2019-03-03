@@ -445,6 +445,12 @@ trove-manage datastore_update "$DATASTORE_TYPE" "$VERSION"
 trove-manage db_load_datastore_config_parameters "$DATASTORE_TYPE" "$VERSION" "$PATH_TROVE"/trove/templates/$DATASTORE_TYPE/validation-rules.json
 ```
 
+Build Trove source distribution:
+
+```bash
+$ python /opt/stack/trove/setup.py sdist
+```
+
 Create cloudinit directory:
 
 ```bash

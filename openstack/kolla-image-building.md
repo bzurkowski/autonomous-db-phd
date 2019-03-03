@@ -29,7 +29,7 @@ $ cd ./kolla
 $ tox -e genconfig
 ```
 
-Build images, e.g.:
+Build images, e.g. for Monasca:
 
 ```bash
 $ kolla-build -t source -b centos monasca
